@@ -22,6 +22,10 @@ pythonで作ったlispっぽいもの 作りかけ
 # 参照はsetの左部分にあれば代入できる
 (set (2 a) 13)
 
+# py でpythonグローバルへ参照
+((py eval) "print("hello world")")
+(set (py eval) eval_)
+
 # += -= 等は一通り使える
 
 # 追加したいプリミティブ and or for(clのloopみたいに)
