@@ -78,7 +78,7 @@ class Sub(GSetter):
     def __init__(self, k, env):
         self.val = main(k[1], env)
         if ':' in k[0]:
-            self.sub = slice(*[main(i if i != '' else 'None') for i in k[0].split(':')])
+            self.sub = slice(*[main(i if i != '' else 'None', env) for i in k[0].split(':')])
         else:
             self.sub = main(k[0], env)
 
@@ -98,9 +98,10 @@ class Method(GSetter):
     def __init__(self, k, env):
         self.a = main(k[1], env)
         self.k = k
+        self.env = env
         for i in k[2:-1]:
             if type(i) == list:
-                self.a = getattr(self.a, i[0])(*[main(j) for j in i[1:]])
+                self.a = getattr(self.a, i[0])(*[main(j, env) for j in i[1:]])
             else:
                 self.a = getattr(self.a, i)
 
@@ -109,14 +110,23 @@ class Method(GSetter):
             a = self.a.get()
         else:
             a = self.a
-        return getattr(a, self.k[-1])
+        if type(self.k[-1]) == list:
+            return getattr(a, self.k[-1][0])(*[main(j, self.env) for j in self.k[-1][1:]])
+        else:
+            return getattr(a, self.k[-1])
 
     def set(self, it):
         if isinstance(self.a, GSetter):
             a = self.a.get()
         else:
             a = self.a
-        return setattr(a, self.k[-1], it)
+
+        if type(self.k[-1]) == list:
+            b = getattr(a, self.k[-1][0])(*[main(j, self.env) for j in self.k[-1][1:]])
+            b = it
+            return it
+        else:
+            return setattr(a, self.k[-1], it)
 
 class Py(GSetter):
     def __init__(self, k):
@@ -223,6 +233,8 @@ def main(k, env):
     elif k[0] == 'let':
 
         val = main(k[2], env)
+        if isinstance(val, GSetter):
+            val = val.get()
         env[k[1]] = val
         return val
 
@@ -242,9 +254,6 @@ def main(k, env):
         else:
             return a
 
-    #elif isinstance(k[0], GSetter):
-    #    return 
-
     # 添字
     elif type(k[0]) == str \
             and (k[0].isdigit() or type(k[0][0]) == '"' or ':' in k[0]):
@@ -259,6 +268,8 @@ def main(k, env):
     elif k[0] == 'set':
         a = main(k[1], env)
         b = main(k[2], env)
+        if isinstance(b, GSetter):
+            b = b.get()
 
         if isinstance(a, GSetter):
             a.set(b)
@@ -324,9 +335,12 @@ glv['%']        = lambda x, *args: x % args
 glv['=']        = lambda *args: all(i == args[0] for i in args[1:])
 glv['==']       = lambda *args: all(i == args[0] for i in args[1:])
 glv['is']       = lambda *args: all(i is args[0] for i in args[1:])
-glv['eval']     = lambda arg: main(arg, nowenv)
+glv['eval_']    = lambda arg: main(arg, nowenv)
 glv['identity'] = lambda x: x
 glv['Set']      = lambda *args, **kwargs: set(*args, **kwargs)
+glv['mklist']   = lambda *args: list(args)
+glv['mktuple']  = lambda *args: args
+glv['mkdict']   = lambda **kwargs: kwargs
 
 glv['apply']    = lambda f, lst: f(*lst)
 
