@@ -34,6 +34,8 @@ pythonで作ったlispっぽいもの 作りかけ
 # setは被ってしまったのでSetでアクセスできる
 # evalはとりあえずeval_という名前に
 
+# 変数はnolisローカル->nolisグローバル->pythonグローバルの順に見ていく
+
 トリビア
 (= "hello" 'hello)
 (functools.reduce + '(1 2 3 4 5))
