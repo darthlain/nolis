@@ -23,7 +23,6 @@ pythonで作ったlispっぽいもの 作りかけ
 (set (2 a) 13)
 
 # py でpythonグローバルへ参照
-((py eval) "print("hello world")")
 (set (py eval) eval_)
 
 # += -= 等は一通り使える
