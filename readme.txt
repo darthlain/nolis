@@ -10,6 +10,9 @@ pythonで作ったlispっぽいもの 作りかけ
 (quote it) # itは文字列になる
 (import it :from . :as .)
 (if 1 2 3 4 5)
+(py x) # pythonグローバル
+(0 lst) # 添字
+(-> sys stdout (write "hello world")) # メソッド
 
 # -> でメソッド参照
 ((-> "hello {}" format) "world")
