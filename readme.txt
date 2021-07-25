@@ -9,7 +9,7 @@ pythonで作ったlispっぽいもの 作りかけ
 (do ...) # begin
 (quote it) # itは文字列になる
 (import it :from . :as .)
-(if 1 2 3 4 5)
+(if 1 2 3 4 5 ...)
 (and ...)
 (or ...)
 (py x) # pythonグローバル
