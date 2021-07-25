@@ -1,9 +1,6 @@
-# 書きかけ 一生 -> そんなことはなかったぜ！
-
 from collections import defaultdict
 import copy, sys, functools, fractions, traceback
 
-# lis.py版よりくっそ遅そう 一文字ずつ解析はない
 def kaiseki(s, acc = [], sacc = ''):
 
     if s == '':
@@ -138,6 +135,7 @@ class Py(GSetter):
     def set(self, it):
         globals()[self.a] = it
 
+# ここかなり苦労してる
 def arg(parms, args, kwargs):
     d = {}
 
@@ -146,11 +144,15 @@ def arg(parms, args, kwargs):
         d[parms] = args
         d.update(kwargs)
         return d
+    
+    # まずparmsのリストを作って 適用されるたびに消す
+    rest = []
 
-    for i in range(len(parms)):
-        # デフォルト引数
-        if type(parms[i]) == list:
-            d[parms[i][0]] = parms[i][1]
+    for i in parms:
+        if type(i) == list:
+            rest.append(i[0])
+        else:
+            rest.append(i)
         
     for i in range(len(args)):
         # rest
@@ -158,9 +160,6 @@ def arg(parms, args, kwargs):
             d[parms[i + 1]] = args[i:]
             d.update(kwargs)
             return d
-
-        elif type(args[i]) == list:
-            d[args[i][0]] = args[i][1]
 
         elif type(parms[i]) == list:
             d[parms[i][0]] = args[i]
@@ -186,6 +185,7 @@ class Env(dict):
 
 glv = Env()
 nowenv = None
+
 
 def main(k, env):
     global nowenv
@@ -229,6 +229,20 @@ def main(k, env):
                 return main(k[i], env)
             elif main(k[i], env):
                 return main(k[i + 1], env)
+
+    elif k[0] == 'and':
+        for i in k[1:]:
+            a = main(i, env)
+            if not a:
+                return a
+        return a
+
+    elif k[0] == 'or':
+        for i in k[1:]:
+            a = main(i, env)
+            if a:
+                return a
+        return a
                 
     elif k[0] == 'let':
 
@@ -246,6 +260,8 @@ def main(k, env):
                 main(['do', *k[2:]], Env(k[1], args, kwargs, env))
     
     elif k[0] == 'begin' or k[0] == 'do':
+        if len(k) == 1:
+            return None
         for i in k[1:-1]:
             main(i, env)
         a = main(k[-1], env)
@@ -327,17 +343,18 @@ def _eval(s):
     return m
 
 glv['+']        = lambda *args: functools.reduce(lambda x, y: x + y, args[1:], args[0])
-glv['-']        = lambda *args: functools.reduce(lambda x, y: x + y, [-i for i in args[1:]], args[0])
+glv['-']        = lambda *args: functools.reduce(lambda x, y: x - y, args[1:], args[0])
 glv['*']        = lambda *args: functools.reduce(lambda x, y: x * y, args[1:], args[0])
-glv['/']        = lambda *args: functools.reduce(fractions.Fraction, args[1:], args[0])
+glv['/']        = lambda *args: functools.reduce(lambda x, y: x / y, args[1:], args[0])
 glv['//']       = lambda x, y: x // y
 glv['%']        = lambda x, *args: x % args
 glv['=']        = lambda *args: all(i == args[0] for i in args[1:])
 glv['==']       = lambda *args: all(i == args[0] for i in args[1:])
 glv['is']       = lambda *args: all(i is args[0] for i in args[1:])
 glv['eval_']    = lambda arg: main(arg, nowenv)
+glv['isa']      = isinstance
+glv['Set']      = set
 glv['identity'] = lambda x: x
-glv['Set']      = lambda *args, **kwargs: set(*args, **kwargs)
 glv['mklist']   = lambda *args: list(args)
 glv['mktuple']  = lambda *args: args
 glv['mkdict']   = lambda **kwargs: kwargs
