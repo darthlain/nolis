@@ -13,6 +13,7 @@ pythonで作ったlispっぽいもの 作りかけ
 
 # -> でメソッド参照
 ((-> "hello {}" format) "world")
+(-> "hello {}" (format "world"))
 
 # 関数部分に数や文字列を入れると添字参照になる スライスも使える
 (let a (list (range 1 6)))
