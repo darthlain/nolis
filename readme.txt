@@ -40,6 +40,10 @@ pythonで作ったlispっぽいもの 作りかけ
 # setは被ってしまったのでSetでアクセスできる
 # evalはとりあえずeval_という名前に
 
+(mklist 1 2 3 ...)
+(mktuple 1 2 3 ...)
+(mkdict :a 1 :b 2 :c 3 ...)
+
 # 変数はnolisローカル->nolisグローバル->pythonグローバルの順に見ていく
 
 トリビア
