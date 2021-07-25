@@ -10,6 +10,8 @@ pythonで作ったlispっぽいもの 作りかけ
 (quote it) # itは文字列になる
 (import it :from . :as .)
 (if 1 2 3 4 5)
+(and ...)
+(or ...)
 (py x) # pythonグローバル
 (0 lst) # 添字
 (-> sys stdout (write "hello world")) # メソッド
@@ -31,7 +33,7 @@ pythonで作ったlispっぽいもの 作りかけ
 
 # += -= 等は一通り使える
 
-# 追加したいプリミティブ and or for(clのloopみたいに)
+# 追加したいプリミティブ for(clのloopみたいに)
 
 関数
 # + - % = == is 等
